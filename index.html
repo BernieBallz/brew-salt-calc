@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hop-Forward Brewing Salt Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4);
+            border-color: #3b82f6;
+        }
+        .result-value {
+            transition: color 0.3s ease-in-out;
+        }
+        details > summary {
+            cursor: pointer;
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details summary .arrow {
+            transition: transform 0.2s ease-in-out;
+        }
+        details[open] summary .arrow {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl mx-auto">
+        <div class="bg-slate-800 shadow-2xl rounded-2xl p-4 sm:p-6 md:p-8">
+            
+            <header class="text-center mb-8">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Hop-Forward Brewing Salt Calculator</h1>
+                <p class="mt-2 text-slate-400 text-sm sm:text-base">For soft, modern IPAs using RO water.</p>
+            </header>
+
+            <!-- User Input Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label for="mash-volume" class="block text-base sm:text-lg font-medium text-slate-300 mb-2">Mash Water Volume (L)</label>
+                    <input 
+                        type="number" 
+                        id="mash-volume"
+                        class="form-input w-full p-3 sm:p-4 bg-slate-700 border-2 border-slate-600 rounded-lg text-white text-lg sm:text-xl placeholder-slate-500 focus:border-blue-500 transition duration-300"
+                        placeholder="e.g., 100"
+                        min="0"
+                        step="any"
+                    >
+                </div>
+                <div>
+                    <label for="final-volume" class="block text-base sm:text-lg font-medium text-slate-300 mb-2">Final Volume in Fermenter (L)</label>
+                    <input 
+                        type="number" 
+                        id="final-volume"
+                        class="form-input w-full p-3 sm:p-4 bg-slate-700 border-2 border-slate-600 rounded-lg text-white text-lg sm:text-xl placeholder-slate-500 focus:border-blue-500 transition duration-300"
+                        placeholder="e.g., 300"
+                        min="0"
+                        step="any"
+                    >
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="space-y-8">
+                <!-- Mash Additions -->
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-semibold text-white border-b-2 border-slate-700 pb-2 mb-4">
+                        Mash Water Additions
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                        <div class="bg-slate-700/50 p-4 sm:p-6 rounded-xl">
+                            <p class="text-sm sm:text-base font-medium text-slate-400">Gypsum (CaSO₄)</p>
+                            <p class="text-3xl sm:text-4xl font-bold text-cyan-400 mt-2 result-value">
+                                <span id="mash-gypsum-grams">0</span> g
+                            </p>
+                        </div>
+                        <div class="bg-slate-700/50 p-4 sm:p-6 rounded-xl">
+                            <p class="text-sm sm:text-base font-medium text-slate-400">Calcium Chloride (CaCl₂)</p>
+                            <p class="text-3xl sm:text-4xl font-bold text-amber-400 mt-2 result-value">
+                                <span id="mash-calcium-chloride-grams">0</span> g
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sparge/Kettle Additions -->
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-semibold text-white border-b-2 border-slate-700 pb-2 mb-4">
+                        Sparge / Boil Kettle Additions
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                        <div class="bg-slate-700/50 p-4 sm:p-6 rounded-xl">
+                            <p class="text-sm sm:text-base font-medium text-slate-400">Gypsum (CaSO₄)</p>
+                            <p class="text-3xl sm:text-4xl font-bold text-cyan-400 mt-2 result-value">
+                                <span id="sparge-gypsum-grams">0</span> g
+                            </p>
+                        </div>
+                        <div class="bg-slate-700/50 p-4 sm:p-6 rounded-xl">
+                            <p class="text-sm sm:text-base font-medium text-slate-400">Calcium Chloride (CaCl₂)</p>
+                            <p class="text-3xl sm:text-4xl font-bold text-amber-400 mt-2 result-value">
+                                <span id="sparge-calcium-chloride-grams">0</span> g
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Water Profile -->
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-semibold text-white border-b-2 border-slate-700 pb-2 mb-4">
+                        Resulting Water & pH Profile
+                    </h2>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                        <!-- Final Mineral Values -->
+                        <div class="bg-slate-900/60 p-4 rounded-xl">
+                            <p class="text-xs sm:text-sm font-medium text-slate-400">Final Calcium (Ca)</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-white mt-1 result-value"><span id="final-calcium">0</span> ppm</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-xl">
+                            <p class="text-xs sm:text-sm font-medium text-slate-400">Final Sulfate (SO₄)</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-cyan-400 mt-1">100 ppm</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-xl">
+                            <p class="text-xs sm:text-sm font-medium text-slate-400">Final Chloride (Cl)</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-amber-400 mt-1">150 ppm</p>
+                        </div>
+                        <div class="bg-green-900/50 border border-green-700 p-4 rounded-xl">
+                            <p class="text-xs sm:text-sm font-medium text-green-300">Est. Mash pH</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-green-400 mt-1 result-value"><span id="estimated-ph">5.70</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Post-Boil pH Adjustment -->
+                <div>
+                     <h2 class="text-xl sm:text-2xl font-semibold text-white border-b-2 border-slate-700 pb-2 mb-4">
+                        End of Boil Adjustment
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                        <div class="bg-slate-700/50 p-4 sm:p-6 rounded-xl">
+                            <p class="text-sm sm:text-base font-medium text-slate-400">Post-Boil Target pH</p>
+                            <p class="text-3xl sm:text-4xl font-bold text-green-400 mt-2 result-value">4.90</p>
+                        </div>
+                        <div class="bg-slate-700/50 p-4 sm:p-6 rounded-xl">
+                            <p class="text-sm sm:text-base font-medium text-slate-400">Est. Lactic Acid (88%)</p>
+                            <p class="text-3xl sm:text-4xl font-bold text-yellow-400 mt-2 result-value">
+                                <span id="lactic-acid-grams">0</span> g
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="text-center mt-8 text-xs text-slate-500 border-t border-slate-700 pt-6">
+                <p>Assumes pure RO water. All pH values are estimates; actual values will vary. Always use a calibrated pH meter.</p>
+            </footer>
+
+            <div class="mt-6">
+                <details class="bg-slate-900/50 rounded-lg">
+                    <summary class="flex justify-between items-center p-4 font-medium text-slate-300 hover:bg-slate-700/50 rounded-lg transition-colors text-sm sm:text-base">
+                        <span>Operational Notes & Assumptions</span>
+                        <svg class="w-5 h-5 text-slate-400 arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+                    </summary>
+                    <div class="p-4 border-t border-slate-700 text-slate-400 text-sm space-y-3">
+                        <p><strong class="text-slate-300">Methodology:</strong> This calculator determines the salts needed for your mash to hit an ideal estimated pH. It then calculates the remaining salts needed for your sparge/kettle additions to hit the final target mineral profile in the total volume.</p>
+                        <p><strong class="text-slate-300">Post-Boil Acid:</strong> To counter the pH rise from heavy dry hopping, a lower knockout pH is recommended. The calculator estimates the grams of 88% Lactic Acid to add at the end of the boil to reach this modern target.</p>
+                        <p><strong class="text-slate-300">Target Profile:</strong> Calibrated for a soft, hop-forward beer style, aiming for a final water profile of 100 ppm Sulfate (SO₄) and 150 ppm Chloride (Cl).</p>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Constants ---
+        const TARGET_SULFATE = 100;
+        const TARGET_CHLORIDE = 150;
+        const GYPSUM_SULFATE_CONTRIBUTION = 558;
+        const GYPSUM_CALCIUM_CONTRIBUTION = 233;
+        const CALCIUM_CHLORIDE_CHLORIDE_CONTRIBUTION = 482;
+        const CALCIUM_CHLORIDE_CALCIUM_CONTRIBUTION = 273;
+        const BASE_PALE_MALT_PH = 5.7;
+        const CALCIUM_PPM_PER_PH_DROP_POINT = 75;
+        const TARGET_POST_BOIL_PH = 4.9;
+        const NATURAL_BOIL_PH_DROP = 0.3;
+        const LACTIC_ACID_G_PER_L_PER_0_1_PH_DROP = 0.063; // Grams of 88% Lactic Acid to drop 1L of wort by 0.1 pH
+
+        // --- DOM Elements ---
+        const mashVolumeInput = document.getElementById('mash-volume');
+        const finalVolumeInput = document.getElementById('final-volume');
+        const mashGypsumOutput = document.getElementById('mash-gypsum-grams');
+        const mashCalciumChlorideOutput = document.getElementById('mash-calcium-chloride-grams');
+        const spargeGypsumOutput = document.getElementById('sparge-gypsum-grams');
+        const spargeCalciumChlorideOutput = document.getElementById('sparge-calcium-chloride-grams');
+        const finalCalciumOutput = document.getElementById('final-calcium');
+        const estimatedPhOutput = document.getElementById('estimated-ph');
+        const lacticAcidOutput = document.getElementById('lactic-acid-grams');
+
+        function calculateAndDisplay() {
+            const mashVolume = parseFloat(mashVolumeInput.value) || 0;
+            const finalVolume = parseFloat(finalVolumeInput.value) || 0;
+
+            if (mashVolume <= 0 || finalVolume <= 0 || mashVolume > finalVolume) {
+                // Reset everything if inputs are invalid
+                [mashGypsumOutput, mashCalciumChlorideOutput, spargeGypsumOutput, spargeCalciumChlorideOutput, finalCalciumOutput, lacticAcidOutput].forEach(el => el.textContent = '0');
+                estimatedPhOutput.textContent = BASE_PALE_MALT_PH.toFixed(2);
+                return;
+            }
+
+            // --- Total Salt Calculations ---
+            const totalGramsOfGypsum = (TARGET_SULFATE / GYPSUM_SULFATE_CONTRIBUTION) * finalVolume;
+            const totalGramsOfCalciumChloride = (TARGET_CHLORIDE / CALCIUM_CHLORIDE_CHLORIDE_CONTRIBUTION) * finalVolume;
+
+            const TARGET_MASH_CALCIUM_FOR_PH = 110; 
+            const totalRatio = totalGramsOfGypsum / totalGramsOfCalciumChloride;
+            
+            let mashCalciumChlorideGrams = (TARGET_MASH_CALCIUM_FOR_PH * mashVolume) / (totalRatio * GYPSUM_CALCIUM_CONTRIBUTION + CALCIUM_CHLORIDE_CALCIUM_CONTRIBUTION);
+            let mashGypsumGrams = mashCalciumChlorideGrams * totalRatio;
+
+            mashGypsumGrams = Math.min(mashGypsumGrams, totalGramsOfGypsum);
+            mashCalciumChlorideGrams = Math.min(mashCalciumChlorideGrams, totalGramsOfCalciumChloride);
+
+            const spargeGypsumGrams = totalGramsOfGypsum - mashGypsumGrams;
+            const spargeCalciumChlorideGrams = totalGramsOfCalciumChloride - mashCalciumChlorideGrams;
+
+            // --- Profile Calculation ---
+            const mashCalciumPPM = ((mashGypsumGrams * GYPSUM_CALCIUM_CONTRIBUTION) + (mashCalciumChlorideGrams * CALCIUM_CHLORIDE_CALCIUM_CONTRIBUTION)) / mashVolume;
+            const phDrop = mashCalciumPPM / CALCIUM_PPM_PER_PH_DROP_POINT * 0.1;
+            const estimatedMashPH = BASE_PALE_MALT_PH - phDrop;
+            const totalCalciumPPM = ((totalGramsOfGypsum * GYPSUM_CALCIUM_CONTRIBUTION) + (totalGramsOfCalciumChloride * CALCIUM_CHLORIDE_CALCIUM_CONTRIBUTION)) / finalVolume;
+
+            // --- Post-Boil Acid Calculation ---
+            const estimatedPostBoilPH = estimatedMashPH - NATURAL_BOIL_PH_DROP;
+            const requiredPhDropForAcid = Math.max(0, estimatedPostBoilPH - TARGET_POST_BOIL_PH);
+            const lacticAcidGrams = (requiredPhDropForAcid * 10) * LACTIC_ACID_G_PER_L_PER_0_1_PH_DROP * finalVolume;
+
+            // --- Update UI ---
+            mashGypsumOutput.textContent = Math.floor(mashGypsumGrams);
+            mashCalciumChlorideOutput.textContent = Math.floor(mashCalciumChlorideGrams);
+            spargeGypsumOutput.textContent = Math.floor(spargeGypsumGrams);
+            spargeCalciumChlorideOutput.textContent = Math.floor(spargeCalciumChlorideGrams);
+            finalCalciumOutput.textContent = totalCalciumPPM.toFixed(0);
+            estimatedPhOutput.textContent = estimatedMashPH.toFixed(2);
+            lacticAcidOutput.textContent = Math.floor(lacticAcidGrams);
+        }
+
+        // --- Event Listeners ---
+        mashVolumeInput.addEventListener('input', calculateAndDisplay);
+        finalVolumeInput.addEventListener('input', calculateAndDisplay);
+
+        // --- Initial Calculation ---
+        calculateAndDisplay();
+    </script>
+</body>
+</html>
