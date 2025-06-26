@@ -46,7 +46,7 @@
             </header>
 
             <!-- User Input Section -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <div>
                     <label for="mash-volume" class="block text-base sm:text-lg font-medium text-slate-300 mb-2">Mash Volume (L)</label>
                     <input 
@@ -67,18 +67,6 @@
                         placeholder="e.g., 300"
                         min="0"
                         step="any"
-                    >
-                </div>
-                 <div>
-                    <label for="start-ph" class="block text-base sm:text-lg font-medium text-slate-300 mb-2">RO Water pH</label>
-                    <input 
-                        type="number" 
-                        id="start-ph"
-                        class="form-input w-full p-3 sm:p-4 bg-slate-700 border-2 border-slate-600 rounded-lg text-white text-lg sm:text-xl placeholder-slate-500 focus:border-blue-500 transition duration-300"
-                        placeholder="e.g., 7.0"
-                        value="7.0"
-                        min="0"
-                        step="0.1"
                     >
                 </div>
             </div>
@@ -130,9 +118,9 @@
                 <!-- Final Water Profile -->
                 <div>
                     <h2 class="text-xl sm:text-2xl font-semibold text-white border-b-2 border-slate-700 pb-2 mb-4">
-                        Resulting Water & pH Profile
+                        Resulting Water Profile
                     </h2>
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                         <!-- Final Mineral Values -->
                         <div class="bg-slate-900/60 p-4 rounded-xl">
                             <p class="text-xs sm:text-sm font-medium text-slate-400">Final Calcium (Ca)</p>
@@ -146,35 +134,12 @@
                             <p class="text-xs sm:text-sm font-medium text-slate-400">Final Chloride (Cl)</p>
                             <p class="text-2xl sm:text-3xl font-bold text-amber-400 mt-1">150 ppm</p>
                         </div>
-                        <div class="bg-green-900/50 border border-green-700 p-4 rounded-xl">
-                            <p class="text-xs sm:text-sm font-medium text-green-300">Est. Mash pH</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-green-400 mt-1 result-value"><span id="estimated-ph">5.70</span></p>
-                        </div>
-                    </div>
-                </div>
-
-                 <!-- Post-Boil pH Adjustment -->
-                <div>
-                     <h2 class="text-xl sm:text-2xl font-semibold text-white border-b-2 border-slate-700 pb-2 mb-4">
-                        End of Boil Adjustment
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-                        <div class="bg-slate-700/50 p-4 sm:p-6 rounded-xl">
-                            <p class="text-sm sm:text-base font-medium text-slate-400">Post-Boil Target pH</p>
-                            <p class="text-3xl sm:text-4xl font-bold text-green-400 mt-2 result-value">4.90</p>
-                        </div>
-                        <div class="bg-slate-700/50 p-4 sm:p-6 rounded-xl">
-                            <p class="text-sm sm:text-base font-medium text-slate-400">Est. Lactic Acid (88%)</p>
-                            <p class="text-3xl sm:text-4xl font-bold text-yellow-400 mt-2 result-value">
-                                <span id="lactic-acid-grams">0</span> g
-                            </p>
-                        </div>
                     </div>
                 </div>
             </div>
 
             <footer class="text-center mt-8 text-xs text-slate-500 border-t border-slate-700 pt-6">
-                <p>Assumes pure RO water. All pH values are estimates; actual values will vary. Always use a calibrated pH meter.</p>
+                <p>Calculations assume you are starting with pure Reverse Osmosis (RO) water.</p>
             </footer>
 
             <div class="mt-6">
@@ -184,8 +149,7 @@
                         <svg class="w-5 h-5 text-slate-400 arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
                     </summary>
                     <div class="p-4 border-t border-slate-700 text-slate-400 text-sm space-y-3">
-                        <p><strong class="text-slate-300">Methodology:</strong> This calculator determines the total salts needed to hit your final mineral profile. It then splits these salts proportionally between the mash and sparge water based on volumes, and estimates the resulting mash pH.</p>
-                        <p><strong class="text-slate-300">Post-Boil Acid:</strong> To counter the pH rise from heavy dry hopping, a lower knockout pH is recommended. The calculator estimates the grams of 88% Lactic Acid to add at the end of the boil to reach this modern target.</p>
+                        <p><strong class="text-slate-300">Methodology:</strong> This calculator determines the total salts needed to hit your final mineral profile. It then splits these salts proportionally between the mash and sparge water based on the volumes you enter.</p>
                         <p><strong class="text-slate-300">Target Profile:</strong> Calibrated for a soft, hop-forward beer style, aiming for a final water profile of 100 ppm Sulfate (SO₄) and 150 ppm Chloride (Cl).</p>
                     </div>
                 </details>
@@ -202,32 +166,22 @@
         const GYPSUM_CALCIUM_CONTRIBUTION = 233;
         const CALCIUM_CHLORIDE_CHLORIDE_CONTRIBUTION = 482;
         const CALCIUM_CHLORIDE_CALCIUM_CONTRIBUTION = 273;
-        const PALE_MALT_PH_EFFECT = -0.9; 
-        const CALCIUM_PPM_PER_PH_DROP_POINT = 75;
-        const TARGET_POST_BOIL_PH = 4.9;
-        const NATURAL_BOIL_PH_DROP = 0.3;
-        const LACTIC_ACID_G_PER_L_PER_0_1_PH_DROP = 0.063; // Grams of 88% Lactic Acid to drop 1L of wort by 0.1 pH
 
         // --- DOM Elements ---
         const mashVolumeInput = document.getElementById('mash-volume');
         const finalVolumeInput = document.getElementById('final-volume');
-        const startPhInput = document.getElementById('start-ph');
         const mashGypsumOutput = document.getElementById('mash-gypsum-grams');
         const mashCalciumChlorideOutput = document.getElementById('mash-calcium-chloride-grams');
         const spargeGypsumOutput = document.getElementById('sparge-gypsum-grams');
         const spargeCalciumChlorideOutput = document.getElementById('sparge-calcium-chloride-grams');
         const finalCalciumOutput = document.getElementById('final-calcium');
-        const estimatedPhOutput = document.getElementById('estimated-ph');
-        const lacticAcidOutput = document.getElementById('lactic-acid-grams');
 
         function calculateAndDisplay() {
             const mashVolume = parseFloat(mashVolumeInput.value) || 0;
             const finalVolume = parseFloat(finalVolumeInput.value) || 0;
-            const startPh = parseFloat(startPhInput.value) || 7.0;
 
             if (mashVolume <= 0 || finalVolume <= 0 || mashVolume > finalVolume) {
-                [mashGypsumOutput, mashCalciumChlorideOutput, spargeGypsumOutput, spargeCalciumChlorideOutput, finalCalciumOutput, lacticAcidOutput].forEach(el => el.textContent = '0');
-                estimatedPhOutput.textContent = (startPh + PALE_MALT_PH_EFFECT).toFixed(2);
+                [mashGypsumOutput, mashCalciumChlorideOutput, spargeGypsumOutput, spargeCalciumChlorideOutput, finalCalciumOutput].forEach(el => el.textContent = '0');
                 return;
             }
 
@@ -243,18 +197,8 @@
             const spargeGypsumGrams = totalGramsOfGypsum - mashGypsumGrams;
             const spargeCalciumChlorideGrams = totalGramsOfCalciumChloride - mashCalciumChlorideGrams;
 
-            // --- Step 3: Estimate the MASH pH based on the mash additions ---
-            const baseMashPh = startPh + PALE_MALT_PH_EFFECT;
-            const mashCalciumPPM = (mashVolume > 0) ? ((mashGypsumGrams * GYPSUM_CALCIUM_CONTRIBUTION) + (mashCalciumChlorideGrams * CALCIUM_CHLORIDE_CALCIUM_CONTRIBUTION)) / mashVolume : 0;
-            const phDropFromSalts = mashCalciumPPM / CALCIUM_PPM_PER_PH_DROP_POINT * 0.1;
-            const estimatedMashPH = baseMashPh - phDropFromSalts;
-            
-            // --- Step 4: Calculate final mineral profile and acid addition ---
+            // --- Step 3: Calculate the final resulting Calcium ppm ---
             const totalCalciumPPM = (finalVolume > 0) ? ((totalGramsOfGypsum * GYPSUM_CALCIUM_CONTRIBUTION) + (totalGramsOfCalciumChloride * CALCIUM_CHLORIDE_CALCIUM_CONTRIBUTION)) / finalVolume : 0;
-
-            const estimatedPostBoilPH = estimatedMashPH - NATURAL_BOIL_PH_DROP;
-            const requiredPhDropForAcid = Math.max(0, estimatedPostBoilPH - TARGET_POST_BOIL_PH);
-            const lacticAcidGrams = (requiredPhDropForAcid * 10) * LACTIC_ACID_G_PER_L_PER_0_1_PH_DROP * finalVolume;
 
             // --- Update UI ---
             mashGypsumOutput.textContent = Math.floor(mashGypsumGrams);
@@ -262,14 +206,11 @@
             spargeGypsumOutput.textContent = Math.floor(spargeGypsumGrams);
             spargeCalciumChlorideOutput.textContent = Math.floor(spargeCalciumChlorideGrams);
             finalCalciumOutput.textContent = totalCalciumPPM.toFixed(0);
-            estimatedPhOutput.textContent = estimatedMashPH.toFixed(2);
-            lacticAcidOutput.textContent = Math.floor(lacticAcidGrams);
         }
 
         // --- Event Listeners ---
         mashVolumeInput.addEventListener('input', calculateAndDisplay);
         finalVolumeInput.addEventListener('input', calculateAndDisplay);
-        startPhInput.addEventListener('input', calculateAndDisplay);
 
         // --- Initial Calculation ---
         calculateAndDisplay();
